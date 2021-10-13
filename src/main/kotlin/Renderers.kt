@@ -12,7 +12,7 @@ abstract class Renderer : SkiaRenderer {
     }
 }
 
-class CycleDiagramRenderer(private val layer: SkiaLayer, val data: CycleDiagramData) : Renderer() {
+class CycleDiagramRenderer(private val layer: SkiaLayer, val data: FloatAndStringData) : Renderer() {
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale
         canvas.scale(contentScale, contentScale)
@@ -24,7 +24,7 @@ class CycleDiagramRenderer(private val layer: SkiaLayer, val data: CycleDiagramD
     }
 }
 
-class HistogramRenderer(private val layer: SkiaLayer, val data: HistogramData) : Renderer() {
+class HistogramRenderer(private val layer: SkiaLayer, val data: FloatAndStringData) : Renderer() {
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale
         canvas.scale(contentScale, contentScale)
