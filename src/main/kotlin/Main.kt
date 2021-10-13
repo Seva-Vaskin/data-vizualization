@@ -1,15 +1,22 @@
 
 fun main(args: Array<String>) {
-    val parsedArguments = argumentsParse(args)
-    when (parsedArguments.diagramType) {
-        DiagramType.CycleDiagram -> {
-            val data = parseCycleDiagramData(parsedArguments.dataFile)
-            createCycleDiagramWindow("Cycle Diagram", data)
+    try {
+        val parsedArguments = argumentsParse(args)
+        when (parsedArguments.diagramType) {
+            DiagramTypes.CycleDiagram -> {
+                val data = parseNumberAndStringData(parsedArguments.dataFile)
+                createCycleDiagramWindow("Cycle Diagram", data)
+            }
+            DiagramTypes.Histogram -> {
+                val data = parseNumberAndStringData(parsedArguments.dataFile)
+                createHistogramWindow("Histogram", data)
+            }
+            DiagramTypes.DissipationDiagram -> {
+                TODO()
+            }
         }
-        DiagramType.Histogram -> {
-            val data = parseHistogramData(parsedArguments.dataFile)
-            createHistogramWindow("Histogram", data)
-        }
-        DiagramType.DissipationDiagram -> TODO()
+    } catch (e: Exception) {
+        System.err.println("Something went wrong :)")
+        System.err.println(e.message)
     }
 }
