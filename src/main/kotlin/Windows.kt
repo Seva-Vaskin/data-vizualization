@@ -5,7 +5,7 @@ import org.jetbrains.skiko.SkiaWindow
 import java.awt.Dimension
 import javax.swing.WindowConstants
 
-fun createCycleDiagramWindow(title: String, data: FloatAndStringData) = runBlocking(Dispatchers.Swing) {
+fun createCycleDiagramWindow(title: String, data: NumberAndStringData) = runBlocking(Dispatchers.Swing) {
     val window = SkiaWindow()
     window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = title
@@ -20,7 +20,7 @@ fun createCycleDiagramWindow(title: String, data: FloatAndStringData) = runBlock
 }
 
 
-fun createHistogramWindow(title: String, data: FloatAndStringData) = runBlocking(Dispatchers.Swing) {
+fun createHistogramWindow(title: String, data: NumberAndStringData) = runBlocking(Dispatchers.Swing) {
     val window = SkiaWindow()
     window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = title
