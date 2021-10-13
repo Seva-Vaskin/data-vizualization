@@ -1,3 +1,6 @@
+import java.io.File
+import java.io.FileNotFoundException
+
 data class ParsedArguments(val diagramType: DiagramTypes, val dataFile: String)
 
 fun argumentsParse(args: Array<String>): ParsedArguments {
@@ -6,6 +9,8 @@ fun argumentsParse(args: Array<String>): ParsedArguments {
     }
     val typeString = args[0]
     val dataFileString = args[1]
+    if (!File(dataFileString).isFile)
+        throw FileNotFoundException("File $dataFileString is not exists")
     val diagramType = when (typeString) {
         "-h", "--histogram" -> DiagramTypes.Histogram
         "-c", "--cycle" -> DiagramTypes.CycleDiagram
