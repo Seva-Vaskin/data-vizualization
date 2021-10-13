@@ -1,0 +1,4 @@
+100~Men
+100~Women
+150~Kids
+79~Animals
