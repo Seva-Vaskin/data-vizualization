@@ -77,7 +77,7 @@ class CycleDiagramRenderer(private val layer: SkiaLayer, val data: CycleDiagramD
         }
     }
 
-    private fun drawLegend(canvas: Canvas, legendRect: Rect, legend: List<Legend>) {
+    private fun drawLegend(canvas: Canvas, legendRect: Rect, legend: List<CycleDiagramLegend>) {
         // split drawable rectangular into blocks
         val blocks = splitRectVerticalIntoBlocks(legendRect, legend.size)
         val ballRect = mutableListOf<Rect>()

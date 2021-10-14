@@ -2,7 +2,6 @@ import java.io.File
 
 data class NumberAndString(val number: Float, val string: String)
 typealias NumberAndStringData = List<NumberAndString>
-typealias TwoNumbersData = List<Pair<Float, Float>>
 
 fun parseNumberAndStringData(dataFile: String): NumberAndStringData {
     val result = mutableListOf<NumberAndString>()
@@ -18,11 +17,7 @@ fun parseNumberAndStringData(dataFile: String): NumberAndStringData {
     return result
 }
 
-fun parseTwoFloatsData(dataFile: String): TwoNumbersData {
-    TODO()
-}
-
-data class Legend(val colorCode: Int, val title: String)
+data class CycleDiagramLegend(val colorCode: Int, val title: String)
 data class CycleDiagramData(val data: NumberAndStringData, var colorCodes: List<Int>, var sum: Float) {
 
     constructor(numberAndStringData: NumberAndStringData) : this(numberAndStringData, listOf(), 0f){
@@ -34,9 +29,9 @@ data class CycleDiagramData(val data: NumberAndStringData, var colorCodes: List<
         }
     }
 
-    fun toLegend(): List<Legend> {
-        return List<Legend>(data.size) {
-            Legend(colorCodes[it], data[it].string)
+    fun toLegend(): List<CycleDiagramLegend> {
+        return List(data.size) {
+            CycleDiagramLegend(colorCodes[it], data[it].string)
         }
     }
 }
