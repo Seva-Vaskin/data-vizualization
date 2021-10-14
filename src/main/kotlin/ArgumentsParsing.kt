@@ -1,21 +1,42 @@
 import java.io.File
 import java.io.FileNotFoundException
 
-data class ParsedArguments(val diagramType: DiagramTypes, val dataFile: String)
+data class ParsedArguments(val diagramType: DiagramTypes, val dataFile: String, val columnsNumber: Int = -1)
+
+fun checkFilePath(path: String) {
+    if (!File(path).isFile)
+        throw FileNotFoundException("File $path is not exists")
+}
 
 fun argumentsParse(args: Array<String>): ParsedArguments {
-    if (args.size != 2) {
-        throw IllegalArgumentException("Need 2 arguments, but ${args.size} given")
+    if (args.isEmpty()) {
+        throw IllegalArgumentException("Need at least one argument")
     }
-    val typeString = args[0]
-    val dataFileString = args[1]
-    if (!File(dataFileString).isFile)
-        throw FileNotFoundException("File $dataFileString is not exists")
-    val diagramType = when (typeString) {
+    val diagramTypeString = args[0]
+    val diagramType = when (diagramTypeString) {
         "-h", "--histogram" -> DiagramTypes.Histogram
         "-c", "--cycle" -> DiagramTypes.CycleDiagram
-        "-d", "--dissipation" -> DiagramTypes.DissipationDiagram
+        "-s", "--scatter" -> DiagramTypes.ScatterPlot
         else -> throw IllegalArgumentException("Undefined type of diagram")
     }
-    return ParsedArguments(diagramType, dataFileString)
+    when (diagramType) {
+        DiagramTypes.CycleDiagram -> {
+            if (args.size < 2) {
+                throw Exception("Cycle diagram needs at least 2 arguments")
+            }
+            val dataFileString = args[1]
+            checkFilePath(dataFileString)
+            return ParsedArguments(diagramType, dataFileString)
+        }
+        DiagramTypes.Histogram -> {
+            val columnsNumber = args[1].toIntOrNull()
+                ?: throw Exception("2nd argument in histogram should be a number, but ${args[1]} given")
+            val dataFileString = args[2]
+            checkFilePath(dataFileString)
+            return ParsedArguments(diagramType, dataFileString, columnsNumber)
+        }
+        DiagramTypes.ScatterPlot -> {
+            TODO()
+        }
+    }
 }

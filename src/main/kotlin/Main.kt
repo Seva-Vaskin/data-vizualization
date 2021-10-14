@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
                 val data = parseNumberAndStringData(parsedArguments.dataFile)
                 createHistogramWindow("Histogram", data)
             }
-            DiagramTypes.DissipationDiagram -> {
+            DiagramTypes.ScatterPlot -> {
                 TODO()
             }
         }
