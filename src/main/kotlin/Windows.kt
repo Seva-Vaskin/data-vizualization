@@ -20,7 +20,7 @@ fun createCycleDiagramWindow(title: String, data: CycleDiagramData) = runBlockin
 }
 
 
-fun createHistogramWindow(title: String, data: NumberAndStringData) = runBlocking(Dispatchers.Swing) {
+fun createHistogramWindow(title: String, data: HistogramData) = runBlocking(Dispatchers.Swing) {
     val window = SkiaWindow()
     window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = title

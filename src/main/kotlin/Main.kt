@@ -9,8 +9,9 @@ fun main(args: Array<String>) {
                 createCycleDiagramWindow("Cycle Diagram", cycleDiagramData)
             }
             DiagramTypes.Histogram -> {
-                val data = parseNumberAndStringData(parsedArguments.dataFile)
-                createHistogramWindow("Histogram", data)
+                val numbersData = parseNumbersData(parsedArguments.dataFile)
+                val histogramData = HistogramData(parsedArguments.columnsNumber, numbersData)
+                createHistogramWindow("Histogram", histogramData)
             }
             DiagramTypes.ScatterPlot -> {
                 TODO()

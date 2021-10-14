@@ -22,8 +22,15 @@ fun splitRectHorizontal(rect: Rect, factor: Float): Pair<Rect, Rect> {
 
 fun splitRectVerticalIntoBlocks(rect: Rect, count: Int): List<Rect> {
     val heightOfBlock = rect.height / count
-    return List<Rect>(count) {
+    return List(count) {
         Rect(rect.left, rect.top + it * heightOfBlock, rect.right, rect.top + (it + 1) * heightOfBlock)
+    }
+}
+
+fun splitRectHorizontalIntoBlocks(rect: Rect, count: Int): List<Rect> {
+    val widthOfBlock = rect.width / count
+    return List(count) {
+        Rect(rect.left + it * widthOfBlock, rect.top, rect.left + (it + 1) * widthOfBlock, rect.bottom)
     }
 }
 
