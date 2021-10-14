@@ -3,13 +3,15 @@ import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
 import kotlin.math.min
 
+/**
+ * Describes common part of all renderers in project
+ */
 abstract class Renderer : SkiaRenderer {
     private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
-    private val maxFontSize = 500
-    private val fonts = List(maxFontSize + 1) {
+    val maxFontSize = 500
+    val fonts = List(maxFontSize + 1) {
         Font(typeface, it.toFloat())
     }
-
     val fillPaint = Paint().apply {
         mode = PaintMode.FILL
     }
@@ -19,35 +21,6 @@ abstract class Renderer : SkiaRenderer {
         strokeWidth = 5f
     }
 
-    fun drawLegend(canvas: Canvas, legendRect: Rect, legend: List<Legend>) {
-        val blocks = splitRectVerticalIntoBlocks(legendRect, legend.size)
-        val ballRect = mutableListOf<Rect>()
-        val textRect = mutableListOf<Rect>()
-        for (i in legend.indices) {
-            var (ball, text) = splitRectHorizontal(blocks[i], 0.15f)
-            ball = makeRectSmaller(ball, 4f)
-            ballRect.add(ball)
-            textRect.add(text)
-        }
-        // find font size
-        var fontSize = maxFontSize.toFloat()
-        for (i in legend.indices)
-            fontSize = min(fontSize, fitTextSizeToRect(textRect[i], legend[i].title))
-        for (i in legend.indices) {
-            // draw ball
-            fillPaint.color = legend[i].colorCode
-            val radius = min(fontSize / 2, ballRect[i].width / 2)
-            val font = fonts[fontSize.toInt()]
-            canvas.drawCircle(
-                ballRect[i].left + radius,
-                ballRect[i].bottom - font.measureText(legend[i].title, fillPaint).height / 2,
-                radius, fillPaint
-            )
-            // draw text
-            fillPaint.color = 0xff000000.toInt() // black
-            canvas.drawString(legend[i].title, textRect[i].left, textRect[i].bottom, fonts[fontSize.toInt()], fillPaint)
-        }
-    }
 
     fun fitTextSizeToRect(rect: Rect, text: String): Float {
         val basicSize = min(rect.height, maxFontSize.toFloat())
@@ -67,6 +40,9 @@ abstract class Renderer : SkiaRenderer {
 
 }
 
+/**
+ * Describes how to render cycle diagram
+ */
 class CycleDiagramRenderer(private val layer: SkiaLayer, val data: CycleDiagramData) : Renderer() {
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale
@@ -79,14 +55,11 @@ class CycleDiagramRenderer(private val layer: SkiaLayer, val data: CycleDiagramD
         legendRect = makeRectSmaller(legendRect, 5f)
         drawCycleDiagram(canvas, diagramRect, fillPaint, strokePaint)
         drawLegend(canvas, legendRect, data.toLegend())
-        // РИСОВАНИЕ
         layer.needRedraw()
-
     }
 
     private fun drawCycleDiagram(canvas: Canvas, diagramRect: Rect, fillPaint: Paint, strokePaint: Paint) {
         val diagramSquare = getMiddleSquare(diagramRect)
-        fillPaint.color = getColorByIndex(0)
         var prefSum = 0f
         for (i in data.data.indices) {
             fillPaint.color = getColorByIndex(i)
@@ -103,8 +76,44 @@ class CycleDiagramRenderer(private val layer: SkiaLayer, val data: CycleDiagramD
             prefSum += data.data[i].number
         }
     }
+
+    private fun drawLegend(canvas: Canvas, legendRect: Rect, legend: List<Legend>) {
+        // split drawable rectangular into blocks
+        val blocks = splitRectVerticalIntoBlocks(legendRect, legend.size)
+        val ballRect = mutableListOf<Rect>()
+        val textRect = mutableListOf<Rect>()
+        for (i in legend.indices) {
+            var (ball, text) = splitRectHorizontal(blocks[i], 0.15f)
+            ball = makeRectSmaller(ball, 4f)
+            ballRect.add(ball)
+            textRect.add(text)
+        }
+        // find font size
+        var fontSize = maxFontSize.toFloat()
+        for (i in legend.indices)
+            fontSize = min(fontSize, fitTextSizeToRect(textRect[i], legend[i].title))
+        // draw
+        for (i in legend.indices) {
+            // draw ball
+            fillPaint.color = legend[i].colorCode
+            val radius = min(fontSize / 2, ballRect[i].width / 2)
+            val font = fonts[fontSize.toInt()]
+            canvas.drawCircle(
+                ballRect[i].left + radius,
+                ballRect[i].bottom - font.measureText(legend[i].title, fillPaint).height / 2,
+                radius, fillPaint
+            )
+            // draw text
+            fillPaint.color = 0xff000000.toInt() // black
+            canvas.drawString(legend[i].title, textRect[i].left, textRect[i].bottom, fonts[fontSize.toInt()], fillPaint)
+        }
+    }
+
 }
 
+/**
+ * Describes how to render histogram
+ */
 class HistogramRenderer(private val layer: SkiaLayer, val data: NumberAndStringData) : Renderer() {
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale
