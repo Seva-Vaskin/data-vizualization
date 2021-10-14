@@ -20,7 +20,7 @@ fun parseNumberAndStringData(dataFile: String): NumberAndStringData {
 data class CycleDiagramLegend(val colorCode: Int, val title: String)
 data class CycleDiagramData(val data: NumberAndStringData, var colorCodes: List<Int>, var sum: Float) {
 
-    constructor(numberAndStringData: NumberAndStringData) : this(numberAndStringData, listOf(), 0f){
+    constructor(numberAndStringData: NumberAndStringData) : this(numberAndStringData, listOf(), 0f) {
         colorCodes = List(numberAndStringData.size) {
             getColorByIndex(it)
         }
@@ -36,4 +36,13 @@ data class CycleDiagramData(val data: NumberAndStringData, var colorCodes: List<
     }
 }
 
+typealias NumbersData = List<Float>
 
+fun parseNumbersData(dataFile: String): NumbersData {
+    val result = mutableListOf<Float>()
+    for (line in File(dataFile).readLines()) {
+        val number = line.toFloatOrNull() ?: throw Exception("\"$line\" is not a number")
+        result.add(number)
+    }
+    return result
+}
