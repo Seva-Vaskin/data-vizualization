@@ -1,29 +1,90 @@
 import org.jetbrains.skija.*
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
-import kotlin.random.Random as Random
+import kotlin.math.min
 
 abstract class Renderer : SkiaRenderer {
-    val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
-    val font = Font(typeface, 40f)
+    private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
+    private val maxFontSize = 500
+    private val fonts = List(maxFontSize + 1) {
+        Font(typeface, it.toFloat())
+    }
+
+    val fillPaint = Paint().apply {
+        mode = PaintMode.FILL
+    }
+    val strokePaint = Paint().apply {
+        mode = PaintMode.STROKE
+        color = 0xff000000.toInt()
+        strokeWidth = 5f
+    }
+
+    fun drawLegend(canvas: Canvas, legendRect: Rect, legend: List<Legend>) {
+        val blocks = splitRectVerticalIntoBlocks(legendRect, legend.size)
+        val ballRect = mutableListOf<Rect>()
+        val textRect = mutableListOf<Rect>()
+        for (i in legend.indices) {
+            var (ball, text) = splitRectHorizontal(blocks[i], 0.15f)
+            ball = makeRectSmaller(ball, 4f)
+            ballRect.add(ball)
+            textRect.add(text)
+        }
+        // find font size
+        var fontSize = maxFontSize.toFloat()
+        for (i in legend.indices)
+            fontSize = min(fontSize, fitTextSizeToRect(textRect[i], legend[i].title))
+        for (i in legend.indices) {
+            // draw ball
+            fillPaint.color = legend[i].colorCode
+            val radius = min(fontSize / 2, ballRect[i].width / 2)
+            val font = fonts[fontSize.toInt()]
+            canvas.drawCircle(
+                ballRect[i].left + radius,
+                ballRect[i].bottom - font.measureText(legend[i].title, fillPaint).height / 2,
+                radius, fillPaint
+            )
+            // draw text
+            fillPaint.color = 0xff000000.toInt() // black
+            canvas.drawString(legend[i].title, textRect[i].left, textRect[i].bottom , fonts[fontSize.toInt()], fillPaint)
+        }
+    }
+
+    fun fitTextSizeToRect(rect: Rect, text: String): Float {
+        val basicSize = min(rect.height, maxFontSize.toFloat())
+        if (fonts[basicSize.toInt()].measureText(text, fillPaint).width <= rect.width)
+            return basicSize
+        var minimalSize = 0
+        var maximalSize = basicSize.toInt()
+        while (maximalSize - minimalSize > 1) {
+            val currentSize = (maximalSize + minimalSize) / 2
+            if (fonts[currentSize].measureText(text, fillPaint).width <= rect.width)
+                minimalSize = currentSize
+            else
+                maximalSize = currentSize
+        }
+        return minimalSize.toFloat()
+    }
 
 }
 
-class CycleDiagramRenderer(private val layer: SkiaLayer, val data: NumberAndStringData) : Renderer() {
+class CycleDiagramRenderer(private val layer: SkiaLayer, val data: CycleDiagramData) : Renderer() {
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale
         canvas.scale(contentScale, contentScale)
         val w = (width / contentScale).toInt()
         val h = (height / contentScale).toInt()
-        val fillPaint = Paint().apply {
-            mode = PaintMode.FILL
-        }
-        val strokePaint = Paint().apply {
-            mode = PaintMode.STROKE
-            color = 0xff000000.toInt()
-            strokeWidth = 5f
-        }
-        val diagramRect = Rect(0f, 0f, w.toFloat(), h.toFloat())
+        val windowRect = Rect(0f, 0f, w.toFloat(), h.toFloat())
+        var (diagramRect, legendRect) = (if (w < h) ::splitRectVertical else ::splitRectHorizontal)(windowRect, 0.5f)
+        diagramRect = makeRectSmaller(diagramRect, 5f)
+        legendRect = makeRectSmaller(legendRect, 5f)
+        drawCycleDiagram(canvas, diagramRect, fillPaint, strokePaint)
+        drawLegend(canvas, legendRect, data.toLegend())
+        // РИСОВАНИЕ
+        layer.needRedraw()
+
+    }
+
+    private fun drawCycleDiagram(canvas: Canvas, diagramRect: Rect, fillPaint: Paint, strokePaint: Paint) {
         val diagramSquare = getMiddleSquare(diagramRect)
         fillPaint.color = getColorByIndex(0)
         var prefSum = 0f
@@ -31,15 +92,16 @@ class CycleDiagramRenderer(private val layer: SkiaLayer, val data: NumberAndStri
             fillPaint.color = getColorByIndex(i)
             val startAngle = prefSum / data.sum * 360
             val sweepAngle = data.data[i].number / data.sum * 360
-            canvas.drawArc(diagramSquare.left, diagramSquare.top, diagramSquare.right, diagramSquare.bottom,
-                startAngle, sweepAngle, true, fillPaint)
-            canvas.drawArc(diagramSquare.left, diagramSquare.top, diagramSquare.right, diagramSquare.bottom,
-                startAngle, sweepAngle, true, strokePaint)
+            canvas.drawArc(
+                diagramSquare.left, diagramSquare.top, diagramSquare.right, diagramSquare.bottom,
+                startAngle, sweepAngle, true, fillPaint
+            )
+            canvas.drawArc(
+                diagramSquare.left, diagramSquare.top, diagramSquare.right, diagramSquare.bottom,
+                startAngle, sweepAngle, true, strokePaint
+            )
             prefSum += data.data[i].number
         }
-        // РИСОВАНИЕ
-        layer.needRedraw()
-
     }
 }
 
@@ -52,6 +114,33 @@ class HistogramRenderer(private val layer: SkiaLayer, val data: NumberAndStringD
         // РИСОВАНИЕ
         layer.needRedraw()
         TODO()
+    }
+}
+
+fun makeRectSmaller(rect: Rect, border: Float): Rect {
+    return Rect(rect.left + border, rect.top + border, rect.right - border, rect.bottom - border)
+}
+
+fun splitRectVertical(rect: Rect, factor: Float): Pair<Rect, Rect> {
+    assert(factor in 0.0..1.0)
+    return Pair(
+        Rect(rect.left, rect.top, rect.right, rect.top + rect.height * factor),
+        Rect(rect.left, rect.top + rect.height * factor, rect.right, rect.bottom)
+    )
+}
+
+fun splitRectHorizontal(rect: Rect, factor: Float): Pair<Rect, Rect> {
+    assert(factor in 0.0..1.0)
+    return Pair(
+        Rect(rect.left, rect.top, rect.left + rect.width * factor, rect.bottom),
+        Rect(rect.left + rect.width * factor, rect.top, rect.right, rect.bottom)
+    )
+}
+
+fun splitRectVerticalIntoBlocks(rect: Rect, count: Int): List<Rect> {
+    val heightOfBlock = rect.height / count
+    return List<Rect>(count) {
+        Rect(rect.left, rect.top + it * heightOfBlock, rect.right, rect.top + (it + 1) * heightOfBlock)
     }
 }
 
@@ -72,21 +161,6 @@ fun getMiddleSquare(rect: Rect): Rect {
             rect.right,
             rect.bottom - (h - w) / 2
         )
-}
-
-fun generateRandomColor(): Int {
-    val r = Random.nextInt() % 256
-    val g = Random.nextInt() % 256
-    val b = Random.nextInt() % 256
-    return ((0xff * 256 + r) * 256 + g) * 256 + b
-}
-
-fun getColorByIndex(index: Int): Int {
-    return if (index <= Colors.values().size) {
-        Colors.values()[index].code
-    } else {
-        generateRandomColor()
-    }
 }
 
 

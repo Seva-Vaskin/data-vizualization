@@ -4,8 +4,9 @@ fun main(args: Array<String>) {
         val parsedArguments = argumentsParse(args)
         when (parsedArguments.diagramType) {
             DiagramTypes.CycleDiagram -> {
-                val data = parseNumberAndStringData(parsedArguments.dataFile)
-                createCycleDiagramWindow("Cycle Diagram", data)
+                val numberAndStringData = parseNumberAndStringData(parsedArguments.dataFile)
+                val cycleDiagramData = CycleDiagramData(numberAndStringData)
+                createCycleDiagramWindow("Cycle Diagram", cycleDiagramData)
             }
             DiagramTypes.Histogram -> {
                 val data = parseNumberAndStringData(parsedArguments.dataFile)

@@ -1,3 +1,5 @@
+import kotlin.random.Random
+
 enum class Colors(val code: Int) {
     RED(0xffff3333.toInt()),
     YELLOW(0xffffe433.toInt()),
@@ -19,4 +21,19 @@ enum class Colors(val code: Int) {
     LIGHT_GREEN(0xff9aff98.toInt()),
     LIGHT_PURPLE(0xffb498ff.toInt()),
     LIGHT_YELLOW(0xfffeff98.toInt())
+}
+
+fun generateRandomColor(): Int {
+    val r = Random.nextInt() % 256
+    val g = Random.nextInt() % 256
+    val b = Random.nextInt() % 256
+    return ((0xff * 256 + r) * 256 + g) * 256 + b
+}
+
+fun getColorByIndex(index: Int): Int {
+    return if (index <= Colors.values().size) {
+        Colors.values()[index].code
+    } else {
+        generateRandomColor()
+    }
 }

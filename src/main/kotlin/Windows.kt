@@ -5,7 +5,7 @@ import org.jetbrains.skiko.SkiaWindow
 import java.awt.Dimension
 import javax.swing.WindowConstants
 
-fun createCycleDiagramWindow(title: String, data: NumberAndStringData) = runBlocking(Dispatchers.Swing) {
+fun createCycleDiagramWindow(title: String, data: CycleDiagramData) = runBlocking(Dispatchers.Swing) {
     val window = SkiaWindow()
     window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = title
