@@ -49,13 +49,17 @@ class CycleDiagramRenderer(private val layer: SkiaLayer, val data: CycleDiagramD
         canvas.scale(contentScale, contentScale)
         val w = (width / contentScale).toInt()
         val h = (height / contentScale).toInt()
-        val windowRect = Rect(0f, 0f, w.toFloat(), h.toFloat())
-        var (diagramRect, legendRect) = (if (w < h) ::splitRectVertical else ::splitRectHorizontal)(windowRect, 0.5f)
+        putObjectsOnCanvas(canvas, w, h)
+        layer.needRedraw()
+    }
+
+    fun putObjectsOnCanvas(canvas: Canvas, width: Int, height: Int) {
+        val windowRect = Rect(0f, 0f, width.toFloat(), height.toFloat())
+        var (diagramRect, legendRect) = (if (width < height) ::splitRectVertical else ::splitRectHorizontal)(windowRect, 0.5f)
         diagramRect = makeRectSmaller(diagramRect, 5f)
         legendRect = makeRectSmaller(legendRect, 5f)
         drawCycleDiagram(canvas, diagramRect, fillPaint, strokePaint)
         drawLegend(canvas, legendRect, legend)
-        layer.needRedraw()
     }
 
     private fun drawCycleDiagram(canvas: Canvas, diagramRect: Rect, fillPaint: Paint, strokePaint: Paint) {
@@ -125,7 +129,12 @@ class HistogramRenderer(private val layer: SkiaLayer, val data: HistogramData) :
         canvas.scale(contentScale, contentScale)
         val w = (width / contentScale).toInt()
         val h = (height / contentScale).toInt()
-        val windowRect = Rect(0f, 0f, w.toFloat(), h.toFloat())
+        putObjectsOnCanvas(canvas, w, h)
+        layer.needRedraw()
+    }
+
+    fun putObjectsOnCanvas(canvas: Canvas, width: Int, height: Int) {
+        val windowRect = Rect(0f, 0f, width.toFloat(), height.toFloat())
         val r1 = makeRectSmaller(windowRect, 10f)
         var (verticalLineRect, r2) = splitRectHorizontal(r1, max(0.07f, 30 / r1.width))
         var (histogramRect, horizontalLineRect) = splitRectVertical(r2, min(0.93f, 1 - 30 / r2.height))
@@ -163,7 +172,5 @@ class HistogramRenderer(private val layer: SkiaLayer, val data: HistogramData) :
             verticalLineRect.top + font.measureText(maxCount.toString(), blackFillStrokePaint).height,
             font, blackFillStrokePaint
         )
-        layer.needRedraw()
-
     }
 }

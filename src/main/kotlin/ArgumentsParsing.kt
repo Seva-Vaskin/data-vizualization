@@ -9,9 +9,14 @@ data class ParsedArguments(
     val pngFile: String = ""
 )
 
-fun checkFilePath(path: String) {
+fun checkPathIsFile(path: String) {
     if (!File(path).isFile)
         throw FileNotFoundException("File $path is not exists")
+}
+
+fun checkPathIsNotExists(path: String) {
+    if (File(path).exists())
+        throw Exception("File $path already exists")
 }
 
 fun argumentsParse(args: Array<String>): ParsedArguments {
@@ -27,7 +32,7 @@ fun argumentsParse(args: Array<String>): ParsedArguments {
     }
 
     val dataFile = args[1]
-    checkFilePath(dataFile)
+    checkPathIsFile(dataFile)
 
     var isWaitingColumnsNumber = false
     var columnsNumber = -1
@@ -40,7 +45,7 @@ fun argumentsParse(args: Array<String>): ParsedArguments {
             isWaitingPngFile -> {
                 isWaitingPngFile = false
                 pngFile = args[i]
-                checkFilePath(pngFile)
+                checkPathIsNotExists(pngFile)
                 pngMode = true
             }
             args[i] == "--columns" -> isWaitingColumnsNumber = true

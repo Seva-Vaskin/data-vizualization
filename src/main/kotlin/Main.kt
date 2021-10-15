@@ -1,3 +1,8 @@
+import org.jetbrains.skija.Surface
+import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.SkiaWindow
+import java.nio.file.Files
+import java.nio.file.Path
 
 fun main(args: Array<String>) {
     try {
@@ -6,12 +11,22 @@ fun main(args: Array<String>) {
             DiagramTypes.CycleDiagram -> {
                 val numberAndStringData = parseNumberAndStringData(parsedArguments.dataFile)
                 val cycleDiagramData = CycleDiagramData(numberAndStringData)
-                createCycleDiagramWindow("Cycle Diagram", cycleDiagramData)
+                if (parsedArguments.pngMode) {
+                    cycleDiagramToPng(cycleDiagramData, parsedArguments.pngFile)
+                }
+                else {
+                    createCycleDiagramWindow("Cycle Diagram", cycleDiagramData)
+                }
             }
             DiagramTypes.Histogram -> {
                 val numbersData = parseNumbersData(parsedArguments.dataFile)
                 val histogramData = HistogramData(parsedArguments.columnsNumber, numbersData)
-                createHistogramWindow("Histogram", histogramData)
+                if (parsedArguments.pngMode) {
+                    histogramToPng(histogramData, parsedArguments.pngFile)
+                }
+                else {
+                    createHistogramWindow("Histogram", histogramData)
+                }
             }
             DiagramTypes.ScatterPlot -> {
                 TODO()
