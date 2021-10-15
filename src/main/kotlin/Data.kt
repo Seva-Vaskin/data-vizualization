@@ -1,26 +1,12 @@
-import java.io.File
-import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.min
 
 data class NumberAndString(val number: Float, val string: String)
+
 typealias NumberAndStringData = List<NumberAndString>
 
-fun parseNumberAndStringData(dataFile: String): NumberAndStringData {
-    val result = mutableListOf<NumberAndString>()
-    for (line in File(dataFile).readLines()) {
-        val splitLine = line.split('~')
-        if (splitLine.size != 2) {
-            throw Exception("Incorrect data format in line: $line")
-        }
-        val number =
-            splitLine[0].toFloatOrNull() ?: throw Exception("First parameter in line \"$line\" is not a number")
-        result.add(NumberAndString(number, splitLine[1]))
-    }
-    return result
-}
-
 data class CycleDiagramLegend(val colorCode: Int, val title: String)
+
 data class CycleDiagramData(val data: NumberAndStringData, var colorCodes: List<Int>, var sum: Float) {
 
     constructor(numberAndStringData: NumberAndStringData) : this(numberAndStringData, listOf(), 0f) {
@@ -41,16 +27,8 @@ data class CycleDiagramData(val data: NumberAndStringData, var colorCodes: List<
 
 typealias NumbersData = List<Float>
 
-fun parseNumbersData(dataFile: String): NumbersData {
-    val result = mutableListOf<Float>()
-    for (line in File(dataFile).readLines()) {
-        val number = line.toFloatOrNull() ?: throw Exception("\"$line\" is not a number")
-        result.add(number)
-    }
-    return result
-}
-
 data class HistogramBlock(val left: Float, val right: Float, var count: Int)
+
 data class HistogramData(
     var blocks: List<HistogramBlock>,
     var columnsNumber: Int,
