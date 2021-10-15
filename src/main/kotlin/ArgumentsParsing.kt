@@ -27,7 +27,6 @@ fun argumentsParse(args: Array<String>): ParsedArguments {
     val diagramType = when (diagramTypeString) {
         "-h", "--histogram" -> DiagramTypes.Histogram
         "-c", "--cycle" -> DiagramTypes.CycleDiagram
-        "-s", "--scatter" -> DiagramTypes.ScatterPlot
         else -> throw IllegalArgumentException("Undefined type of diagram")
     }
 

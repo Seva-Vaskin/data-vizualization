@@ -28,9 +28,6 @@ fun main(args: Array<String>) {
                     createHistogramWindow("Histogram", histogramData)
                 }
             }
-            DiagramTypes.ScatterPlot -> {
-                TODO()
-            }
         }
     } catch (e: Exception) {
         System.err.println("Something went wrong :)")
