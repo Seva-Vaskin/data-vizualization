@@ -43,6 +43,7 @@ abstract class Renderer : SkiaRenderer {
  * Describes how to render cycle diagram
  */
 class CycleDiagramRenderer(private val layer: SkiaLayer, val data: CycleDiagramData) : Renderer() {
+    val legend = data.toLegend()
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale
         canvas.scale(contentScale, contentScale)
@@ -53,7 +54,7 @@ class CycleDiagramRenderer(private val layer: SkiaLayer, val data: CycleDiagramD
         diagramRect = makeRectSmaller(diagramRect, 5f)
         legendRect = makeRectSmaller(legendRect, 5f)
         drawCycleDiagram(canvas, diagramRect, fillPaint, strokePaint)
-        drawLegend(canvas, legendRect, data.toLegend())
+        drawLegend(canvas, legendRect, legend)
         layer.needRedraw()
     }
 
@@ -61,7 +62,7 @@ class CycleDiagramRenderer(private val layer: SkiaLayer, val data: CycleDiagramD
         val diagramSquare = getMiddleSquare(diagramRect)
         var prefSum = 0f
         for (i in data.data.indices) {
-            fillPaint.color = getColorByIndex(i)
+            fillPaint.color = data.colorCodes[i]
             val startAngle = prefSum / data.sum * 360
             val sweepAngle = data.data[i].number / data.sum * 360
             canvas.drawArc(
@@ -163,5 +164,6 @@ class HistogramRenderer(private val layer: SkiaLayer, val data: HistogramData) :
             font, blackFillStrokePaint
         )
         layer.needRedraw()
+
     }
 }

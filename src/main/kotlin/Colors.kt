@@ -31,7 +31,7 @@ fun generateRandomColor(): Int {
 }
 
 fun getColorByIndex(index: Int): Int {
-    return if (index <= Colors.values().size) {
+    return if (index < Colors.values().size) {
         Colors.values()[index].code
     } else {
         generateRandomColor()
