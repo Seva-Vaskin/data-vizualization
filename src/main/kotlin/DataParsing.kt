@@ -11,6 +11,9 @@ fun parseNumberAndStringData(dataFile: String): NumberAndStringData {
             splitLine[0].toFloatOrNull() ?: throw Exception("First parameter in line \"$line\" is not a number")
         result.add(NumberAndString(number, splitLine[1]))
     }
+    if (result.isEmpty()) {
+        throw Exception("Data can't be empty")
+    }
     return result
 }
 
@@ -19,6 +22,9 @@ fun parseNumbersData(dataFile: String): NumbersData {
     for (line in File(dataFile).readLines()) {
         val number = line.toFloatOrNull() ?: throw Exception("\"$line\" is not a number")
         result.add(number)
+    }
+    if (result.isEmpty()) {
+        throw Exception("Data can't be empty")
     }
     return result
 }
