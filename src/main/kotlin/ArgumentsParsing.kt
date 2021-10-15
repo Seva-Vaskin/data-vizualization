@@ -1,7 +1,13 @@
 import java.io.File
 import java.io.FileNotFoundException
 
-data class ParsedArguments(val diagramType: DiagramTypes, val dataFile: String, val columnsNumber: Int = -1)
+data class ParsedArguments(
+    val diagramType: DiagramTypes,
+    val dataFile: String,
+    val columnsNumber: Int = -1,
+    val pngMode: Boolean = false,
+    val pngFile: String = ""
+)
 
 fun checkFilePath(path: String) {
     if (!File(path).isFile)
@@ -9,8 +15,8 @@ fun checkFilePath(path: String) {
 }
 
 fun argumentsParse(args: Array<String>): ParsedArguments {
-    if (args.isEmpty()) {
-        throw IllegalArgumentException("Need at least one argument")
+    if (args.size < 2) {
+        throw IllegalArgumentException("Need at least 2 argument")
     }
     val diagramTypeString = args[0]
     val diagramType = when (diagramTypeString) {
@@ -19,24 +25,41 @@ fun argumentsParse(args: Array<String>): ParsedArguments {
         "-s", "--scatter" -> DiagramTypes.ScatterPlot
         else -> throw IllegalArgumentException("Undefined type of diagram")
     }
-    when (diagramType) {
-        DiagramTypes.CycleDiagram -> {
-            if (args.size < 2) {
-                throw Exception("Cycle diagram needs at least 2 arguments")
+
+    val dataFile = args[1]
+    checkFilePath(dataFile)
+
+    var isWaitingColumnsNumber = false
+    var columnsNumber = -1
+    var isWaitingPngFile = false
+    var pngMode = false
+    var pngFile = ""
+    for (i in 2 until args.size) {
+        when {
+            args[i] == "-p" || args[i] == "--png" -> isWaitingPngFile = true
+            isWaitingPngFile -> {
+                isWaitingPngFile = false
+                pngFile = args[i]
+                checkFilePath(pngFile)
+                pngMode = true
             }
-            val dataFileString = args[1]
-            checkFilePath(dataFileString)
-            return ParsedArguments(diagramType, dataFileString)
-        }
-        DiagramTypes.Histogram -> {
-            val columnsNumber = args[1].toIntOrNull()
-                ?: throw Exception("2nd argument in histogram should be a number, but ${args[1]} given")
-            val dataFileString = args[2]
-            checkFilePath(dataFileString)
-            return ParsedArguments(diagramType, dataFileString, columnsNumber)
-        }
-        DiagramTypes.ScatterPlot -> {
-            TODO()
+            args[i] == "--columns" -> isWaitingColumnsNumber = true
+            isWaitingColumnsNumber -> {
+                isWaitingColumnsNumber = false
+                columnsNumber = args[i].toIntOrNull()
+                    ?: throw Exception("columns should be and integer number, but ${args[i]} given")
+            }
         }
     }
+
+    if (isWaitingPngFile) {
+        throw Exception("Path to png file is not given")
+    }
+    if (isWaitingColumnsNumber) {
+        throw Exception("Columns count is not given")
+    }
+    if (columnsNumber == -1 && diagramType == DiagramTypes.Histogram) {
+        throw Exception("Histogram need number of columns to generate")
+    }
+    return ParsedArguments(diagramType, dataFile, columnsNumber, pngMode, pngFile)
 }
