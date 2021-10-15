@@ -1,9 +1,3 @@
-import org.jetbrains.skija.Surface
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkiaWindow
-import java.nio.file.Files
-import java.nio.file.Path
-
 fun main(args: Array<String>) {
     try {
         val parsedArguments = argumentsParse(args)
