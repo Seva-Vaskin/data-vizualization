@@ -55,7 +55,8 @@ class CycleDiagramRenderer(private val layer: SkiaLayer, val data: CycleDiagramD
 
     fun putObjectsOnCanvas(canvas: Canvas, width: Int, height: Int) {
         val windowRect = Rect(0f, 0f, width.toFloat(), height.toFloat())
-        var (diagramRect, legendRect) = (if (width < height) ::splitRectVertical else ::splitRectHorizontal)(windowRect, 0.5f)
+        var (diagramRect, legendRect) =
+            (if (width < height) ::splitRectVertical else ::splitRectHorizontal)(windowRect, 0.5f)
         diagramRect = makeRectSmaller(diagramRect, 5f)
         legendRect = makeRectSmaller(legendRect, 5f)
         drawCycleDiagram(canvas, diagramRect, fillPaint, strokePaint)

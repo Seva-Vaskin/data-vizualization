@@ -13,8 +13,7 @@ fun main(args: Array<String>) {
                 val cycleDiagramData = CycleDiagramData(numberAndStringData)
                 if (parsedArguments.pngMode) {
                     cycleDiagramToPng(cycleDiagramData, parsedArguments.pngFile)
-                }
-                else {
+                } else {
                     createCycleDiagramWindow("Cycle Diagram", cycleDiagramData)
                 }
             }
@@ -23,8 +22,7 @@ fun main(args: Array<String>) {
                 val histogramData = HistogramData(parsedArguments.columnsNumber, numbersData)
                 if (parsedArguments.pngMode) {
                     histogramToPng(histogramData, parsedArguments.pngFile)
-                }
-                else {
+                } else {
                     createHistogramWindow("Histogram", histogramData)
                 }
             }
